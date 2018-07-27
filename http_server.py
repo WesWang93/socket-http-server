@@ -34,7 +34,7 @@ def response_method_not_allowed():
 
     # TODO: Implement response_method_not_allowed
     return b"\r\n".join([
-        b'HTTP/1.1 450 Method Not Allowed',
+        b'HTTP/1.1 405 Method Not Allowed',
         b'',
         b'Method not allowed on this server!'
     ])
@@ -150,7 +150,14 @@ def server(log_buffer=sys.stderr):
 
                 # TODO: Use response_path to retrieve the content and the mimetype,
                 # based on the request path.
-                    content, mime_type = response_path(path)
+                    if path == "/images" or path == "/":
+                        image_path = os.path.join('webroot', path.strip('/'))
+                        content = b'Files available under this path:'
+                        for item in os.listdir(image_path):
+                            content += b'<br>' + os.fsencode(item)
+                        mime_type = 'text/html'
+                    else:
+                        content, mime_type = response_path(path)
 
                 # TODO; If parse_request raised a NotImplementedError, then let
                 # response be a method_not_allowed response. If response_path raised
